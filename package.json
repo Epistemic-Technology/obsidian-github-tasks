@@ -1,0 +1,24 @@
+{
+  "name": "obsidian-github-tasks",
+  "version": "1.0.0",
+  "description": "Obsidian plugin for syncing GitHub issues and PRs to Obsidian",
+  "main": "index.ts",
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build"
+  },
+  "author": "Epistemic Technology",
+  "license": "MIT",
+  "dependencies": {
+    "@octokit/rest": "^22.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.32",
+    "esbuild": "^0.25.5",
+    "obsidian": "^1.8.7",
+    "postcss": "^8.5.6",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vite-plugin-static-copy": "^2.3.1"
+  }
+}

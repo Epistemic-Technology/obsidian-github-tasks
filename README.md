@@ -1,2 +1,2 @@
-# obsidian-github-todo
-Obsidian plugin to sync GitHub issues and PRs to Obsidian TODOs
+# obsidian-github-tasks
+Obsidian plugin to sync GitHub issues and PRs to Obsidian taskss

@@ -1,0 +1,12 @@
+- This is an Obsidian plugin that adds a GitHub tasks list to your vault.
+- It uses the GitHub API to fetch and display your tasks list.
+- It uses TypeScript, the Obsidian plugin API, and the octokit/rest library to interact with the GitHub API.
+- Favor using native html elements such as using the dialog element for modals.
+- Favor using css over javascript for creating animations or other effects.
+- Try to avoid keeping unnecessary state. We prefer stateless components when possible.
+- Obsidian uses lucide icons for its UI. Use these over emoji icons.
+- Use '@' imports rather than relative imports. The '@' specifies the src directory.
+- Avoid inline styles. Use CSS classes and styles.css instead.
+- Use Obsidian CSS variables for styling whenever possible.
+- Use comments very sparingly, except for function and class documentation. The code should speak for itself and comments just get in the way. Only use comments when the code is complex or when it's not immediately obvious what the code is doing.
+- Do not use NodeJS apis. Using NodeJS apis prevents the plugin from being usable with Obsidian mobile.

@@ -1,0 +1,14 @@
+{
+  "id": "github-issues-tasks",
+  "name": "GitHub Issues to Tasks",
+  "version": "1.0.0",
+  "minAppVersion": "1.5.0",
+  "description": "Sync issues and pull requests from your GitHub account to Obsidian tasks.",
+  "author": "Mike Thicke",
+  "authorUrl": "https://github.com/Epistemic-Technology",
+  "fundingUrl": "https://ko-fi.com/epistemictechnology",
+  "helpUrl": "https://github.com/Epistemic-Technology/obsidian-github-tasks#readme",
+  "main": "main.js",
+  "css": "styles.css",
+  "isDesktopOnly": false
+}

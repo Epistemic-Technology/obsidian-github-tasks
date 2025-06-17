@@ -1,0 +1,49 @@
+.ght-settings-security-warning {
+    margin: 1rem;
+    font-size: 0.8rem;
+    color: var(--text-warning);
+    border-style: solid;
+    border-width: 1px;
+    border-color: var(--background-modifier-border);
+    padding: 0.5rem;
+    border-radius: 4px;
+}
+
+/* Settings call-to-action styles */
+.ght-settings-cta {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.ght-settings-feedback {
+    display: flex;
+    flex-direction: row;
+    height: 3rem;
+}
+
+.ght-settings-feedback a {
+    display: flex;
+    gap: 0.5rem;
+    height: 3rem;
+}
+
+.ght-settings-feedback a * {
+    align-self: center;
+}
+
+.ght-settings-donate {
+    align-self: center;
+}
+
+.ght-settings-cta img {
+    height: 2rem;
+}
+
+.ght-settings-cta svg {
+    height: 2rem;
+}
+
+.ght-settings-cta svg path {
+    fill: var(--text-normal);
+}
