@@ -1,4 +1,11 @@
-import { Plugin, App, PluginManifest, TFile, Notice } from "obsidian";
+import {
+  Plugin,
+  App,
+  PluginManifest,
+  TFile,
+  Notice,
+  normalizePath,
+} from "obsidian";
 
 import { GitHubClient } from "@/github";
 import { syncTasks } from "@/sync";
@@ -40,7 +47,7 @@ export class GitHubTasksPlugin extends Plugin {
   async refreshTasks() {
     const github = new GitHubClient(this.settings.githubToken);
     const file = this.app.vault.getAbstractFileByPath(
-      this.settings.githubTasksNote,
+      normalizePath(this.settings.githubTasksNote) + ".md",
     );
     if (!(file instanceof TFile)) {
       new Notice(

@@ -1,4 +1,4 @@
-import { PluginSettingTab, Setting, App } from "obsidian";
+import { PluginSettingTab, Setting, App, normalizePath } from "obsidian";
 import { GitHubTasksPlugin } from "@/main";
 
 export interface GitHubTasksSettings {
@@ -111,7 +111,7 @@ export class GitHubTasksSettingsTab extends PluginSettingTab {
           .setPlaceholder("Enter a path to a note for GitHub tasks")
           .setValue(this.plugin.settings.githubTasksNote)
           .onChange(async (value) => {
-            this.plugin.settings.githubTasksNote = value;
+            this.plugin.settings.githubTasksNote = normalizePath(value);
             await this.plugin.saveSettings();
           }),
       );
