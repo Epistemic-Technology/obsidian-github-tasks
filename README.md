@@ -64,3 +64,5 @@ I am an idependent software developer. If you find GitHub Tasks to be useful, pl
 This is an open source project, using the [MIT License](LICENSE). Pull requests for bug fixes or small improvements are welcome. If you want to get involved in a more substantial way, please [Contact me](https://epistemic.technology/contact/).
 
 To report a bug, request a feature, provide feedback, or ask for help, please [open an issue](https://github.com/Epistemic-Technology/obsidian-github-tasks/issues).
+
+The GitHub logo used in the settings panel is courtesy of [GitHub](https://github.com/). It was adapted from the logo used in the [Obsidian Excalidraw Plugin](https://github.com/zsviczian/obsidian-excalidraw-plugin).
