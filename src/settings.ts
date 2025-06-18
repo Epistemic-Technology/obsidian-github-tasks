@@ -6,7 +6,12 @@ export interface GitHubTasksSettings {
   githubTasksNote: string;
   taskTag: string;
   taskFormat: "tasks" | "dataview";
+  autoRefreshInterval: number;
   importLabels: boolean;
+  repositoryTags: boolean;
+  autoClearCompleted: boolean;
+  showCreatedAt: boolean;
+  showCompletedAt: boolean;
 }
 
 export const DEFAULT_SETTINGS: GitHubTasksSettings = {
@@ -14,7 +19,12 @@ export const DEFAULT_SETTINGS: GitHubTasksSettings = {
   githubTasksNote: "github-tasks",
   taskTag: "#github",
   taskFormat: "tasks",
-  importLabels: true,
+  autoRefreshInterval: 5,
+  importLabels: false,
+  repositoryTags: false,
+  autoClearCompleted: false,
+  showCreatedAt: false,
+  showCompletedAt: true,
 };
 
 export class GitHubTasksSettingsTab extends PluginSettingTab {
@@ -139,14 +149,42 @@ export class GitHubTasksSettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Task format")
-      .setDesc("Choose the date format for tasks")
+      .setDesc(
+        (() => {
+          const fragment = document.createDocumentFragment();
+          fragment.appendChild(
+            document.createTextNode("Choose the format for tasks (see "),
+          );
+          const link = document.createElement("a");
+          link.href =
+            "https://publish.obsidian.md/tasks/Reference/Task+Formats/About+Task+Formats";
+          link.textContent = "Tasks plugin documentation";
+          fragment.appendChild(link);
+          fragment.appendChild(document.createTextNode(")"));
+          return fragment;
+        })(),
+      )
       .addDropdown((dropdown) =>
         dropdown
-          .addOption("tasks", "Tasks format (➕ date)")
-          .addOption("dataview", "Dataview format ([created:: date])")
+          .addOption("tasks", "Tasks Emoji format ")
+          .addOption("dataview", "Dataview format")
           .setValue(this.plugin.settings.taskFormat)
           .onChange(async (value) => {
             this.plugin.settings.taskFormat = value as "tasks" | "dataview";
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName("Auto refresh interval")
+      .setDesc("Automatically refresh tasks every X minutes (0 to disable)")
+      .addText((text) =>
+        text
+          .setPlaceholder("60")
+          .setValue(this.plugin.settings.autoRefreshInterval.toString())
+          .onChange(async (value) => {
+            const numValue = parseInt(value) || 0;
+            this.plugin.settings.autoRefreshInterval = numValue;
             await this.plugin.saveSettings();
           }),
       );
@@ -159,6 +197,54 @@ export class GitHubTasksSettingsTab extends PluginSettingTab {
           .setValue(this.plugin.settings.importLabels)
           .onChange(async (value) => {
             this.plugin.settings.importLabels = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName("Repository tags")
+      .setDesc("Add repository name as a tag to each task")
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.repositoryTags)
+          .onChange(async (value) => {
+            this.plugin.settings.repositoryTags = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName("Auto clear completed")
+      .setDesc("Automatically remove completed tasks from the note")
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.autoClearCompleted)
+          .onChange(async (value) => {
+            this.plugin.settings.autoClearCompleted = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName("Show created date")
+      .setDesc("Include the creation date in task format")
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.showCreatedAt)
+          .onChange(async (value) => {
+            this.plugin.settings.showCreatedAt = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName("Show completed date")
+      .setDesc("Include the completion date in task format")
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.showCompletedAt)
+          .onChange(async (value) => {
+            this.plugin.settings.showCompletedAt = value;
             await this.plugin.saveSettings();
           }),
       );
