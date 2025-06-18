@@ -24,6 +24,7 @@ export interface TaskItem {
   fullLine?: string;
   lineIndex?: number;
   created_at?: string;
+  closed_at?: string;
 }
 
 function normalizeLabel(labelName: string): string {
@@ -51,20 +52,35 @@ export function buildTaskLine(
     allTags = [...allTags, ...labelTags];
   }
 
+  if (settings.repositoryTags) {
+    const repoTag = `${repo}`;
+    allTags.push(repoTag);
+  }
+
   const tagsStr =
     allTags.length > 0 ? ` ${allTags.map((tag) => `#${tag}`).join(" ")}` : "";
 
-  let dateStr = "";
-  if (item.created_at) {
+  let createdDateStr = "";
+  if (settings.showCreatedAt && item.created_at) {
     const date = new Date(item.created_at).toISOString().split("T")[0];
     if (settings.taskFormat === "tasks") {
-      dateStr = ` ➕ ${date}`;
+      createdDateStr = ` ➕ ${date}`;
     } else if (settings.taskFormat === "dataview") {
-      dateStr = ` [created:: ${date}]`;
+      createdDateStr = ` [created:: ${date}]`;
     }
   }
 
-  return `- [${checked}] ${prefix} [${item.title}](${url}) (${repo}#${item.number})${tagsStr}${dateStr} ^gh-${id}`;
+  let completedDateStr = "";
+  if (settings.showCompletedAt && item.closed_at) {
+    const date = new Date(item.closed_at).toISOString().split("T")[0];
+    if (settings.taskFormat === "tasks") {
+      completedDateStr = ` ✅ ${date}`;
+    } else if (settings.taskFormat === "dataview") {
+      completedDateStr = ` [completion:: ${date}]`;
+    }
+  }
+
+  return `- [${checked}] ${prefix} [${item.title}](${url}) (${repo}#${item.number})${tagsStr}${createdDateStr}${completedDateStr} ^gh-${id}`;
 }
 
 export function buildUpdatedTaskLine(
@@ -82,6 +98,20 @@ export function buildUpdatedTaskLine(
   if (existingTask.html_url == item.html_url && existingTask.fullLine) {
     if (item.state === "closed" && existingTask.state !== "closed") {
       existingTask.fullLine = existingTask.fullLine.replace(/\[ \]/, `[x]`);
+      if (settings.showCompletedAt && item.closed_at) {
+        const date = new Date(item.closed_at).toISOString().split("T")[0];
+        if (settings.taskFormat == "dataview") {
+          existingTask.fullLine = existingTask.fullLine.replace(
+            /\^gh/,
+            `[completion:: ${date}] ^gh`,
+          );
+        } else {
+          existingTask.fullLine = existingTask.fullLine.replace(
+            /\^gh/,
+            ` ✅ ${date} ^gh`,
+          );
+        }
+      }
     }
     return existingTask.fullLine;
   }

@@ -134,13 +134,20 @@ function processSectionTasks(
   section.tasks.forEach((existingTask) => {
     const item = itemsById.get(existingTask.id.toString());
     if (item) {
+      if (settings.autoClearCompleted && item.state === "closed") {
+        return;
+      }
       updatedTaskLines.push(
         buildUpdatedTaskLine(item, type, settings, existingTask),
       );
       processedIds.add(existingTask.id.toString());
     } else {
       // Item no longer exists on GitHub, but keep it if it was manually checked off
-      if (existingTask.state === "closed" && existingTask.fullLine) {
+      if (
+        existingTask.state === "closed" &&
+        existingTask.fullLine &&
+        !settings.autoClearCompleted
+      ) {
         updatedTaskLines.push(existingTask.fullLine);
       }
     }
