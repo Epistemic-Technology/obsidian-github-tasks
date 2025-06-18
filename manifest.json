@@ -3,7 +3,7 @@
   "name": "GitHub Tasks",
   "version": "1.0.1",
   "minAppVersion": "1.5.0",
-  "description": "Sync issues and pull requests from your GitHub account to Obsidian tasks.",
+  "description": "Sync issues and pull requests from your GitHub account to tasks.",
   "author": "Mike Thicke",
   "authorUrl": "https://github.com/Epistemic-Technology",
   "fundingUrl": "https://ko-fi.com/epistemictechnology",
