@@ -57,7 +57,8 @@ export class GitHubTasksPlugin extends Plugin {
       return;
     }
     const content = await this.app.vault.read(file);
-    const newContent = await syncTasks(content, github);
+
+    const newContent = await syncTasks(content, github, this.settings);
     await this.app.vault.modify(file, newContent);
   }
 }

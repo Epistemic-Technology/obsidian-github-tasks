@@ -4,11 +4,17 @@ import { GitHubTasksPlugin } from "@/main";
 export interface GitHubTasksSettings {
   githubToken: string;
   githubTasksNote: string;
+  taskTag: string;
+  taskFormat: "tasks" | "dataview";
+  importLabels: boolean;
 }
 
 export const DEFAULT_SETTINGS: GitHubTasksSettings = {
   githubToken: "",
   githubTasksNote: "github-tasks",
+  taskTag: "#github",
+  taskFormat: "tasks",
+  importLabels: true,
 };
 
 export class GitHubTasksSettingsTab extends PluginSettingTab {
@@ -112,6 +118,47 @@ export class GitHubTasksSettingsTab extends PluginSettingTab {
           .setValue(this.plugin.settings.githubTasksNote)
           .onChange(async (value) => {
             this.plugin.settings.githubTasksNote = normalizePath(value);
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName("Tasks tag")
+      .setDesc("Tag to append to GitHub tasks")
+      .addText((text) =>
+        text
+          .setPlaceholder("Enter a #tag to append to tasks")
+          .setValue(this.plugin.settings.taskTag)
+          .onChange(async (value) => {
+            this.plugin.settings.taskTag = value.startsWith("#")
+              ? value
+              : `#${value}`;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName("Task format")
+      .setDesc("Choose the date format for tasks")
+      .addDropdown((dropdown) =>
+        dropdown
+          .addOption("tasks", "Tasks format (➕ date)")
+          .addOption("dataview", "Dataview format ([created:: date])")
+          .setValue(this.plugin.settings.taskFormat)
+          .onChange(async (value) => {
+            this.plugin.settings.taskFormat = value as "tasks" | "dataview";
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName("Import labels")
+      .setDesc("Import GitHub issue/PR labels as tags")
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.importLabels)
+          .onChange(async (value) => {
+            this.plugin.settings.importLabels = value;
             await this.plugin.saveSettings();
           }),
       );

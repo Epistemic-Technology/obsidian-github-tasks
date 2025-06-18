@@ -4,7 +4,9 @@ import {
   TaskItem,
   parseTaskLine,
   buildUpdatedTaskLine,
-} from "./utils";
+} from "@/utils";
+
+import { GitHubTasksSettings } from "@/settings";
 
 interface SectionInfo {
   startIndex: number;
@@ -40,7 +42,11 @@ function findSection(
   };
 }
 
-export async function syncTasks(noteContent: string, github: GitHubClient) {
+export async function syncTasks(
+  noteContent: string,
+  github: GitHubClient,
+  settings: GitHubTasksSettings,
+) {
   const lines = noteContent.split("\n");
   const newLines = [...lines];
 
@@ -48,9 +54,25 @@ export async function syncTasks(noteContent: string, github: GitHubClient) {
   const assignedPRsSection = findSection(lines, /^## PRs assigned to me$/);
   const openedPRsSection = findSection(lines, /^## PRs opened by me$/);
 
-  const issues = await github.getAssignedIssues();
-  const assignedPRs = await github.getAssignedPRs();
-  const openedPRs = await github.getOpenedPRs();
+  let autoTag = settings.taskTag;
+  if (autoTag.startsWith("#")) {
+    autoTag = autoTag.substring(1);
+  }
+
+  const initialTags = autoTag ? [autoTag] : [];
+
+  const issues = (await github.getAssignedIssues()).map((item) => ({
+    ...item,
+    tags: initialTags,
+  }));
+  const assignedPRs = (await github.getAssignedPRs()).map((item) => ({
+    ...item,
+    tags: initialTags,
+  }));
+  const openedPRs = (await github.getOpenedPRs()).map((item) => ({
+    ...item,
+    tags: initialTags,
+  }));
 
   processSectionTasks(
     newLines,
@@ -58,6 +80,7 @@ export async function syncTasks(noteContent: string, github: GitHubClient) {
     issues,
     "issue",
     "## Issues assigned to me",
+    settings,
   );
   processSectionTasks(
     newLines,
@@ -65,6 +88,7 @@ export async function syncTasks(noteContent: string, github: GitHubClient) {
     assignedPRs,
     "pr",
     "## PRs assigned to me",
+    settings,
   );
   processSectionTasks(
     newLines,
@@ -72,6 +96,7 @@ export async function syncTasks(noteContent: string, github: GitHubClient) {
     openedPRs,
     "pr",
     "## PRs opened by me",
+    settings,
   );
 
   return newLines.join("\n");
@@ -83,6 +108,7 @@ function processSectionTasks(
   items: TaskItem[],
   type: "issue" | "pr",
   headerText: string,
+  settings: GitHubTasksSettings,
 ) {
   const itemsById = new Map(items.map((item) => [item.id.toString(), item]));
 
@@ -91,7 +117,7 @@ function processSectionTasks(
       lines.push("", headerText);
       items.forEach((item) => {
         if (item.state === "open") {
-          lines.push(buildTaskLine(item, type));
+          lines.push(buildTaskLine(item, type, settings));
         }
       });
     }
@@ -108,7 +134,9 @@ function processSectionTasks(
   section.tasks.forEach((existingTask) => {
     const item = itemsById.get(existingTask.id.toString());
     if (item) {
-      updatedTaskLines.push(buildUpdatedTaskLine(item, type, existingTask));
+      updatedTaskLines.push(
+        buildUpdatedTaskLine(item, type, settings, existingTask),
+      );
       processedIds.add(existingTask.id.toString());
     } else {
       // Item no longer exists on GitHub, but keep it if it was manually checked off
@@ -121,7 +149,7 @@ function processSectionTasks(
   // Add new items that weren't in the existing tasks (only if they're open)
   items.forEach((item) => {
     if (!processedIds.has(item.id.toString()) && item.state !== "closed") {
-      updatedTaskLines.push(buildTaskLine(item, type));
+      updatedTaskLines.push(buildTaskLine(item, type, settings));
     }
   });
 
