@@ -8,7 +8,5 @@
   "authorUrl": "https://github.com/Epistemic-Technology",
   "fundingUrl": "https://ko-fi.com/epistemictechnology",
   "helpUrl": "https://github.com/Epistemic-Technology/obsidian-github-tasks#readme",
-  "main": "main.js",
-  "css": "styles.css",
   "isDesktopOnly": false
 }
