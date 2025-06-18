@@ -1,4 +1,5 @@
 import { GitHubClient } from "./github";
+import { Notice } from "obsidian";
 import {
   buildTaskLine,
   TaskItem,
@@ -47,8 +48,11 @@ export async function syncTasks(
   github: GitHubClient,
   settings: GitHubTasksSettings,
 ) {
+  if (!settings.githubToken) {
+    new Notice("GitHub personal access token is not set");
+    return;
+  }
   const lines = noteContent.split("\n");
-  const newLines = [...lines];
 
   const issuesSection = findSection(lines, /^## Issues assigned to me$/);
   const assignedPRsSection = findSection(lines, /^## PRs assigned to me$/);
@@ -64,94 +68,138 @@ export async function syncTasks(
   const issues = (await github.getAssignedIssues()).map((item) => ({
     ...item,
     tags: initialTags,
+    closed_at: item.closed_at || undefined,
   }));
   const assignedPRs = (await github.getAssignedPRs()).map((item) => ({
     ...item,
     tags: initialTags,
+    closed_at: item.closed_at || undefined,
   }));
   const openedPRs = (await github.getOpenedPRs()).map((item) => ({
     ...item,
     tags: initialTags,
+    closed_at: item.closed_at || undefined,
   }));
 
-  processSectionTasks(
-    newLines,
-    issuesSection,
-    issues,
-    "issue",
-    "## Issues assigned to me",
-    settings,
-  );
-  processSectionTasks(
-    newLines,
-    assignedPRsSection,
-    assignedPRs,
-    "pr",
-    "## PRs assigned to me",
-    settings,
-  );
-  processSectionTasks(
-    newLines,
-    openedPRsSection,
-    openedPRs,
-    "pr",
-    "## PRs opened by me",
-    settings,
-  );
+  const newLines: string[] = [];
+  let currentLineIndex = 0;
 
-  return newLines.join("\n");
+  const sections = [
+    {
+      section: issuesSection,
+      items: issues,
+      type: "issue" as const,
+      header: "## Issues assigned to me",
+    },
+    {
+      section: assignedPRsSection,
+      items: assignedPRs,
+      type: "pr" as const,
+      header: "## PRs assigned to me",
+    },
+    {
+      section: openedPRsSection,
+      items: openedPRs,
+      type: "pr" as const,
+      header: "## PRs opened by me",
+    },
+  ];
+
+  // Process sections in order they appear in the file
+  for (const { section, items, type, header } of sections) {
+    if (section) {
+      // Copy lines before this section
+      while (currentLineIndex < section.startIndex) {
+        newLines.push(lines[currentLineIndex]);
+        currentLineIndex++;
+      }
+
+      // Add the section header
+      newLines.push(lines[section.startIndex]);
+      currentLineIndex = section.endIndex;
+
+      // Add the section content
+      addSectionContent(newLines, section, items, type, settings);
+    } else if (items.length > 0) {
+      // Section doesn't exist, add it at the end
+      if (
+        newLines.length === 0 ||
+        newLines[newLines.length - 1].trim() !== ""
+      ) {
+        newLines.push("");
+      }
+      newLines.push(header);
+      addSectionContent(newLines, null, items, type, settings);
+    }
+  }
+
+  // Copy any remaining lines
+  while (currentLineIndex < lines.length) {
+    newLines.push(lines[currentLineIndex]);
+    currentLineIndex++;
+  }
+
+  // Filter out excessive blank lines
+  const filteredLines: string[] = [];
+  for (let i = 0; i < newLines.length; i++) {
+    const line = newLines[i];
+    const isBlank = line.trim() === "";
+    const prevIsBlank = i > 0 && newLines[i - 1].trim() === "";
+
+    // Skip if this is a blank line and the previous was also blank
+    if (isBlank && prevIsBlank) {
+      continue;
+    }
+
+    filteredLines.push(line);
+  }
+
+  // Trim blank lines from end
+  while (
+    filteredLines.length > 0 &&
+    filteredLines[filteredLines.length - 1].trim() === ""
+  ) {
+    filteredLines.pop();
+  }
+
+  return filteredLines.join("\n");
 }
 
-function processSectionTasks(
-  lines: string[],
+function addSectionContent(
+  newLines: string[],
   section: SectionInfo | null,
   items: TaskItem[],
   type: "issue" | "pr",
-  headerText: string,
   settings: GitHubTasksSettings,
 ) {
   const itemsById = new Map(items.map((item) => [item.id.toString(), item]));
-
-  if (!section) {
-    if (items.length > 0) {
-      lines.push("", headerText);
-      items.forEach((item) => {
-        if (item.state === "open") {
-          lines.push(buildTaskLine(item, type, settings));
-        }
-      });
-    }
-    return;
-  }
-
-  const existingTasksById = new Map(
-    section.tasks.map((task) => [task.id.toString(), task]),
-  );
   const processedIds = new Set<string>();
-
   const updatedTaskLines: string[] = [];
 
-  section.tasks.forEach((existingTask) => {
-    const item = itemsById.get(existingTask.id.toString());
-    if (item) {
-      if (settings.autoClearCompleted && item.state === "closed") {
-        return;
+  // Process existing tasks if section exists
+  if (section) {
+    section.tasks.forEach((existingTask) => {
+      const item = itemsById.get(existingTask.id.toString());
+      if (item) {
+        processedIds.add(existingTask.id.toString());
+        if (settings.autoClearCompleted && item.state === "closed") {
+          return;
+        }
+        updatedTaskLines.push(
+          buildUpdatedTaskLine(item, type, settings, existingTask),
+        );
+      } else {
+        // Item no longer exists on GitHub, but keep it if it was manually checked off
+        if (
+          existingTask.state === "closed" &&
+          existingTask.fullLine &&
+          !settings.autoClearCompleted
+        ) {
+          updatedTaskLines.push(existingTask.fullLine);
+        }
       }
-      updatedTaskLines.push(
-        buildUpdatedTaskLine(item, type, settings, existingTask),
-      );
-      processedIds.add(existingTask.id.toString());
-    } else {
-      // Item no longer exists on GitHub, but keep it if it was manually checked off
-      if (
-        existingTask.state === "closed" &&
-        existingTask.fullLine &&
-        !settings.autoClearCompleted
-      ) {
-        updatedTaskLines.push(existingTask.fullLine);
-      }
-    }
-  });
+    });
+  }
 
   // Add new items that weren't in the existing tasks (only if they're open)
   items.forEach((item) => {
@@ -160,15 +208,8 @@ function processSectionTasks(
     }
   });
 
-  // Replace the section content
-  const startIndex = section.startIndex + 1;
-  const endIndex = section.endIndex;
-
-  // Remove old task lines
-  lines.splice(startIndex, endIndex - startIndex);
-
-  // Insert updated task lines
-  if (updatedTaskLines.length > 0) {
-    lines.splice(startIndex, 0, ...updatedTaskLines);
-  }
+  // Add all task lines to the new content
+  updatedTaskLines.forEach((line) => {
+    newLines.push(line);
+  });
 }

@@ -20,6 +20,7 @@ import {
 
 export class GitHubTasksPlugin extends Plugin {
   settings: GitHubTasksSettings;
+  refreshInterval: number | undefined;
 
   constructor(app: App, manifest: PluginManifest) {
     super(app, manifest);
@@ -34,6 +35,7 @@ export class GitHubTasksPlugin extends Plugin {
       name: "Refresh GitHub Tasks",
       callback: () => this.refreshTasks(),
     });
+    this.startAutoRefresh();
   }
 
   async loadSettings() {
@@ -42,9 +44,31 @@ export class GitHubTasksPlugin extends Plugin {
 
   async saveSettings() {
     await this.saveData(this.settings);
+    this.startAutoRefresh();
+  }
+
+  startAutoRefresh() {
+    if (this.refreshInterval) {
+      window.clearInterval(this.refreshInterval);
+    }
+
+    if (this.settings.autoRefreshInterval > 0) {
+      this.registerInterval(
+        (this.refreshInterval = window.setInterval(
+          () => this.refreshTasks(),
+          this.settings.autoRefreshInterval * 60 * 1000,
+        )),
+      );
+    }
   }
 
   async refreshTasks() {
+    if (!this.settings.githubToken) {
+      new Notice(
+        "GitHub personal access token not found. Please define it in GitHub Tasks settings.",
+      );
+      return;
+    }
     const github = new GitHubClient(this.settings.githubToken);
     const file = this.app.vault.getAbstractFileByPath(
       normalizePath(this.settings.githubTasksNote) + ".md",
@@ -59,7 +83,7 @@ export class GitHubTasksPlugin extends Plugin {
     const content = await this.app.vault.read(file);
 
     const newContent = await syncTasks(content, github, this.settings);
-    await this.app.vault.modify(file, newContent);
+    await this.app.vault.modify(file, newContent || "");
   }
 }
 
