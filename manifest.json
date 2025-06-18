@@ -1,6 +1,6 @@
 {
-  "id": "github-issues-tasks",
-  "name": "GitHub Issues to Tasks",
+  "id": "github-tasks",
+  "name": "GitHub Tasks",
   "version": "1.0.0",
   "minAppVersion": "1.5.0",
   "description": "Sync issues and pull requests from your GitHub account to Obsidian tasks.",
