@@ -1,7 +1,7 @@
 {
   "id": "github-tasks",
   "name": "GitHub Tasks",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "minAppVersion": "1.5.0",
   "description": "Sync issues and pull requests from your GitHub account to tasks.",
   "author": "Mike Thicke",
