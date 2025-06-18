@@ -107,8 +107,23 @@ export class GitHubTasksSettingsTab extends PluginSettingTab {
     });
 
     new Setting(containerEl)
-      .setName("GitHub Token")
-      .setDesc("Enter your GitHub token")
+      .setName("GitHub PAT")
+      .setDesc(
+        (() => {
+          const fragment = document.createDocumentFragment();
+          fragment.appendChild(
+            document.createTextNode(
+              "Enter your GitHub personal access token (",
+            ),
+          );
+          const link = document.createElement("a");
+          link.href = "https://github.com/settings/personal-access-tokens";
+          link.textContent = "create one here";
+          fragment.appendChild(link);
+          fragment.appendChild(document.createTextNode(")"));
+          return fragment;
+        })(),
+      )
       .addText((text) =>
         text
           .setPlaceholder("Enter your GitHub token")
@@ -227,7 +242,7 @@ export class GitHubTasksSettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Show created date")
-      .setDesc("Include the creation date in task format")
+      .setDesc("Include the creation date in task")
       .addToggle((toggle) =>
         toggle
           .setValue(this.plugin.settings.showCreatedAt)
@@ -239,7 +254,7 @@ export class GitHubTasksSettingsTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Show completed date")
-      .setDesc("Include the completion date in task format")
+      .setDesc("Include the completion date in task")
       .addToggle((toggle) =>
         toggle
           .setValue(this.plugin.settings.showCompletedAt)
