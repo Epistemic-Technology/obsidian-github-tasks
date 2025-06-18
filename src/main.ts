@@ -35,6 +35,11 @@ export class GitHubTasksPlugin extends Plugin {
       name: "Refresh GitHub Tasks",
       callback: () => this.refreshTasks(),
     });
+    this.addCommand({
+      id: "clear-completed-github-tasks",
+      name: "Clear completed GitHub tasks",
+      callback: () => this.clearCompletedTasks(),
+    });
     this.startAutoRefresh();
   }
 
@@ -84,6 +89,36 @@ export class GitHubTasksPlugin extends Plugin {
 
     const newContent = await syncTasks(content, github, this.settings);
     await this.app.vault.modify(file, newContent || "");
+  }
+
+  async clearCompletedTasks() {
+    if (!this.settings.githubToken) {
+      new Notice(
+        "GitHub personal access token not found. Please define it in GitHub Tasks settings.",
+      );
+      return;
+    }
+    const github = new GitHubClient(this.settings.githubToken);
+    const file = this.app.vault.getAbstractFileByPath(
+      normalizePath(this.settings.githubTasksNote) + ".md",
+    );
+    if (!(file instanceof TFile)) {
+      new Notice(
+        "Tasks note not found. Makes sure the note defined in GitHub Tasks settings exists.",
+      );
+      console.error("Tasks note not found: ", this.settings.githubTasksNote);
+      return;
+    }
+    const content = await this.app.vault.read(file);
+
+    const settingsWithAutoClear = {
+      ...this.settings,
+      autoClearCompleted: true,
+    };
+
+    const newContent = await syncTasks(content, github, settingsWithAutoClear);
+    await this.app.vault.modify(file, newContent || "");
+    new Notice("Completed GitHub tasks cleared");
   }
 }
 

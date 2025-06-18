@@ -16,10 +16,10 @@ export interface GitHubTasksSettings {
 
 export const DEFAULT_SETTINGS: GitHubTasksSettings = {
   githubToken: "",
-  githubTasksNote: "github-tasks",
+  githubTasksNote: "GitHub Tasks",
   taskTag: "#github",
   taskFormat: "tasks",
-  autoRefreshInterval: 5,
+  autoRefreshInterval: 0,
   importLabels: false,
   repositoryTags: false,
   autoClearCompleted: false,
@@ -263,5 +263,10 @@ export class GitHubTasksSettingsTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           }),
       );
+  }
+
+  hide() {
+    this.plugin.refreshTasks();
+    super.hide();
   }
 }
