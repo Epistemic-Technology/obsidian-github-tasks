@@ -33,7 +33,7 @@ export class GitHubClient {
       try {
         const response = await requestUrl({
           url: url.toString(),
-          method: (options.method || "GET") as any,
+          method: options.method || "GET",
           headers,
           body: options.body as string,
           throw: false, // Don't throw on HTTP errors, let Octokit handle them
@@ -144,29 +144,5 @@ export class GitHubClient {
       per_page: 100,
     });
     return data.items;
-  }
-
-  async getAllTasks() {
-    const [
-      assignedIssues,
-      assignedPRs,
-      reviewRequestedPRs,
-      openedPRs,
-      authoredIssues,
-    ] = await Promise.all([
-      this.getAssignedIssues(),
-      this.getAssignedPRs(),
-      this.getReviewRequestedPRs(),
-      this.getOpenedPRs(),
-      this.getAuthoredIssues(),
-    ]);
-
-    return {
-      assignedIssues,
-      assignedPRs,
-      reviewRequestedPRs,
-      openedPRs,
-      authoredIssues,
-    };
   }
 }

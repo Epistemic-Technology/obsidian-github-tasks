@@ -31,13 +31,13 @@ export class GitHubTasksPlugin extends Plugin {
     await this.loadSettings();
     this.addSettingTab(new GitHubTasksSettingsTab(this.app, this));
     this.addCommand({
-      id: "refresh-github-tasks",
-      name: "Refresh GitHub Tasks",
+      id: "refresh",
+      name: "Refresh",
       callback: () => this.refreshTasks(),
     });
     this.addCommand({
-      id: "clear-completed-github-tasks",
-      name: "Clear completed GitHub tasks",
+      id: "clear-completed",
+      name: "Clear completed",
       callback: () => this.clearCompletedTasks(),
     });
     this.startAutoRefresh();
