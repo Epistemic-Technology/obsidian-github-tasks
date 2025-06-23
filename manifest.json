@@ -2,7 +2,7 @@
   "id": "github-tasks",
   "name": "GitHub Tasks",
   "version": "1.0.4",
-  "minAppVersion": "1.5.0",
+  "minAppVersion": "1.8.0",
   "description": "Sync issues and pull requests from your GitHub account to tasks.",
   "author": "Mike Thicke",
   "authorUrl": "https://github.com/Epistemic-Technology",
