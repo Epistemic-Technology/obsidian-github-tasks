@@ -135,7 +135,7 @@ export class GitHubTasksSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("GitHub Tasks Note")
+      .setName("GitHub Tasks note")
       .setDesc("Path of the note for GitHub tasks")
       .addText((text) =>
         text
@@ -181,7 +181,7 @@ export class GitHubTasksSettingsTab extends PluginSettingTab {
       )
       .addDropdown((dropdown) =>
         dropdown
-          .addOption("tasks", "Tasks Emoji format ")
+          .addOption("tasks", "Tasks emoji format")
           .addOption("dataview", "Dataview format")
           .setValue(this.plugin.settings.taskFormat)
           .onChange(async (value) => {
@@ -229,7 +229,7 @@ export class GitHubTasksSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Auto clear completed")
+      .setName("Auto-clear completed")
       .setDesc("Automatically remove completed tasks from the note")
       .addToggle((toggle) =>
         toggle

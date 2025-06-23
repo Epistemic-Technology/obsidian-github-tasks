@@ -80,7 +80,7 @@ export class GitHubTasksPlugin extends Plugin {
     );
     if (!(file instanceof TFile)) {
       new Notice(
-        "Tasks note not found. Makes sure the note defined in GitHub Tasks settings exists.",
+        "Tasks note not found. Make sure the note defined in GitHub Tasks settings exists.",
       );
       console.error("Tasks note not found: ", this.settings.githubTasksNote);
       return;
@@ -104,7 +104,7 @@ export class GitHubTasksPlugin extends Plugin {
     );
     if (!(file instanceof TFile)) {
       new Notice(
-        "Tasks note not found. Makes sure the note defined in GitHub Tasks settings exists.",
+        "Tasks note not found. Make sure the note defined in GitHub Tasks settings exists.",
       );
       console.error("Tasks note not found: ", this.settings.githubTasksNote);
       return;
