@@ -67,12 +67,30 @@ export class GitHubClient {
   }
 
   async getAssignedIssues() {
-    const { data } = await this.octokit.issues.listForAuthenticatedUser({
-      filter: "assigned",
-      state: "all",
-      per_page: 100,
-    });
-    return data;
+    let allIssues = [];
+    let page = 1;
+    let hasMore = true;
+
+    while (hasMore) {
+      const { data } = await this.octokit.request("GET /issues", {
+        filter: "assigned",
+        state: "all",
+        sort: "updated",
+        direction: "desc",
+        per_page: 100,
+        page: page,
+      });
+
+      allIssues.push(...data);
+      hasMore = data.length === 100; // If we got 100, there might be more
+      page++;
+
+      // Safety break to avoid infinite loops
+      if (page > 10) break;
+    }
+
+    console.log("Total issues after pagination:", allIssues.length);
+    return allIssues;
   }
 
   async getAssignedPRs() {
