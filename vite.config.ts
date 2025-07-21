@@ -9,10 +9,14 @@ export default defineConfig({
     viteStaticCopy({
       targets: [{ src: "manifest.json", dest: "." }],
     }),
+    viteStaticCopy({
+      targets: [{ src: "styles.css", dest: "." }],
+    }),
   ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@assets": path.resolve(__dirname, "./assets"),
     },
   },
   build: {

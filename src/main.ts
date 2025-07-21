@@ -10,8 +10,6 @@ import {
 import { GitHubClient } from "@/github";
 import { syncTasks } from "@/sync";
 
-import "@/styles.css";
-
 import {
   GitHubTasksSettings,
   DEFAULT_SETTINGS,

@@ -8,11 +8,13 @@
     "jsxImportSource": "solid-js",
     "strict": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@assets/*": ["assets/*"]
     },
-    "types": ["obsidian"]
+    "types": ["obsidian", "vite/client"]
   },
   "include": ["src"]
 }
