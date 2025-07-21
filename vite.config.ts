@@ -10,7 +10,7 @@ export default defineConfig({
       targets: [{ src: "manifest.json", dest: "." }],
     }),
     viteStaticCopy({
-      targets: [{ src: "styles.css", dest: "." }],
+      targets: [{ src: "src/styles.css", dest: "." }],
     }),
   ],
   resolve: {
