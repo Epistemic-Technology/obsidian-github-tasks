@@ -10,6 +10,7 @@ export interface GitHubTasksSettings {
   taskFormat: "tasks" | "dataview";
   autoRefreshInterval: number;
   importLabels: boolean;
+  repositoryDescription: boolean;
   repositoryTags: boolean;
   autoClearCompleted: boolean;
   showCreatedAt: boolean;
@@ -23,6 +24,7 @@ export const DEFAULT_SETTINGS: GitHubTasksSettings = {
   taskFormat: "tasks",
   autoRefreshInterval: 0,
   importLabels: false,
+  repositoryDescription: true,
   repositoryTags: false,
   autoClearCompleted: false,
   showCreatedAt: false,
@@ -145,13 +147,25 @@ export class GitHubTasksSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Import labels")
+      .setName("Import label")
       .setDesc("Import GitHub issue/PR labels as tags")
       .addToggle((toggle) =>
         toggle
           .setValue(this.plugin.settings.importLabels)
           .onChange(async (value) => {
             this.plugin.settings.importLabels = value;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName("Repository descriptions")
+      .setDesc("Add repository name in text to each task")
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.repositoryDescription)
+          .onChange(async (value) => {
+            this.plugin.settings.repositoryDescription = value;
             await this.plugin.saveSettings();
           }),
       );
