@@ -147,7 +147,7 @@ export class GitHubTasksSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Import label")
+      .setName("Import labels")
       .setDesc("Import GitHub issue/PR labels as tags")
       .addToggle((toggle) =>
         toggle
