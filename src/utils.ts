@@ -80,7 +80,12 @@ export function buildTaskLine(
     }
   }
 
-  return `- [${checked}] ${prefix} [${item.title}](${url}) (${repo}#${item.number})${tagsStr}${createdDateStr}${completedDateStr} ^gh-${id}`;
+  let repositoryStr = "";
+  if (settings.repositoryDescription) {
+    repositoryStr = ` (${repo}#${item.number})`;
+  }
+
+  return `- [${checked}] ${prefix} [${item.title}](${url})${repositoryStr} ${tagsStr}${createdDateStr}${completedDateStr} ^gh-${id}`;
 }
 
 export function buildUpdatedTaskLine(
