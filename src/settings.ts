@@ -24,7 +24,7 @@ export const DEFAULT_SETTINGS: GitHubTasksSettings = {
   taskFormat: "tasks",
   autoRefreshInterval: 0,
   importLabels: false,
-  repositoryDescription: true,
+  repositoryDescription: false,
   repositoryTags: false,
   autoClearCompleted: false,
   showCreatedAt: false,
