@@ -81,7 +81,7 @@ export class GitHubClient {
         page: page,
       });
 
-      allIssues.push(...data);
+      allIssues.push(...data.filter((issue) => !("pull_request" in issue)));
       hasMore = data.length === 100; // If we got 100, there might be more
       page++;
 
