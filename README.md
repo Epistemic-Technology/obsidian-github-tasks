@@ -2,7 +2,7 @@
 
 Import GitHub issues and pull requests to Obsidian tasks.
 
-- Import issues assigned to you and PRs assigned to or opened by you.
+- Import issues assigned to you and PRs assigned to you, awaiting your review, or opened by you.
 - Import tasks in Tasks Emoji format or Dataview format (see: [Tasks documentation](https://publish.obsidian.md/tasks/Reference/Task+Formats/About+Task+Formats))
 - Import labels as tags.
 - Closed issues and PRs automatically marked as completed.
@@ -48,6 +48,9 @@ You should use a token specifically for this plugin.
 - If you edit a task, such as to add a due date, refreshing will not overwrite your changes. Only the completed status and completed date will be updated.
 - Changing format settings will not affect existing tasks. If you wish to change the format of existing tasks, I suggest deleting the note content and re-importing the tasks.
 - If you change the GitHub tasks note path, the old note will remain, possibly creating duplicate tasks.
+- **PRs assigned to me** includes PRs assigned to you and pending review requests sent to you or your teams. A PR that is both assigned to you and awaiting your review appears once in this section.
+- When a review request is satisfied or withdrawn, its unchecked task is removed on the next refresh unless the PR is still assigned to you. Submitting a review does not mark the task as completed; completion follows the PR's closed status.
+- Each PR query fetches at most 100 results; PRs beyond the first page may be omitted.
 - PRs that are both opened by you and assigned to you will be duplicated in the note.
 - The `^gh-#######` tag is used to identify tasks imported from GitHub. If removed or edited, the task won't sync correctly from GitHub (it will remain and be duplicated).
 

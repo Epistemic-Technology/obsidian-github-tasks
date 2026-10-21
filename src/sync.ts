@@ -70,11 +70,20 @@ export async function syncTasks(
     tags: initialTags,
     closed_at: item.closed_at || undefined,
   }));
-  const assignedPRs = (await github.getAssignedPRs()).map((item) => ({
-    ...item,
-    tags: initialTags,
-    closed_at: item.closed_at || undefined,
-  }));
+  const assignedPRItems = await github.getAssignedPRs();
+  const reviewRequestedPRItems = await github.getReviewRequestedPRs();
+  const seenPRIds = new Set<number>();
+  const assignedPRs = [...assignedPRItems, ...reviewRequestedPRItems]
+    .filter((item) => {
+      if (seenPRIds.has(item.id)) return false;
+      seenPRIds.add(item.id);
+      return true;
+    })
+    .map((item) => ({
+      ...item,
+      tags: initialTags,
+      closed_at: item.closed_at || undefined,
+    }));
   const openedPRs = (await github.getOpenedPRs()).map((item) => ({
     ...item,
     tags: initialTags,
